@@ -9,9 +9,10 @@ public class Main {
         String s = sc.nextLine().trim();
          Map<String ,Integer> keyvalue=new TreeMap<>();
         while (!s.equals("/exit")) {
-           s= s.replaceAll(" +","");
+
             String[] str=s.split(" +");
            if(s.contains("=")){
+               s= s.replaceAll(" +","");
               String[] kv=s.split("=");
               if(kv[0].matches("[A-Za-z]+") ){
              keyvalue.putAll(varasgn(kv,keyvalue));
@@ -21,13 +22,15 @@ public class Main {
            else if(str.length==1 && str[0].matches("[A-Za-z]+")){
                   keyvalue.putAll(varasgn(str,keyvalue));
            }
-            System.out.println(keyvalue);
+           else{
+               cal(s,keyvalue);
+           }
+
             s = sc.nextLine().trim();
         }
         System.out.println("Bye!");
     }
        public static  Map<String ,Integer> varasgn(String[] s, Map<String ,Integer> map){
-
         if(s.length==2){
             if(map.containsKey(s[1])){
                 map.put(s[0],map.get(s[1]));
@@ -45,20 +48,34 @@ public class Main {
             }
         }
         else if(s.length==1){
-            String num=sc.nextLine();
-            map.put(s[0], Integer.valueOf(num));
+            if(map.containsKey(s[0])){
+                System.out.println(map.get(s[0]));
+            }
+            else {
+                System.out.println("Unknown variable");
+            }
         }
         else System.out.println("Invalid assignment");
 
         return map;
        }
 
-    public static void cal(String s){
+    public static void cal(String s,Map<String ,Integer> map){
 
             if (!s.equals("") && !s.matches("/.+")) {
                 boolean vld=true;
 
                 String[] str = s.split(" +");
+
+
+                for(int i=0;i<str.length;i++){
+                    if(map.containsKey(str[i])){
+                        str[i]=String.valueOf(map.get(str[i]));
+                       continue;
+                    }
+
+
+                }
 
                 List<Integer> num = new ArrayList();
                 for (int i = 0; i < str.length; i++) {
