@@ -24,7 +24,7 @@ public class Main {
                     if (str[i].matches("-+")) {
                         if (str[i].length() % 2 != 0) {
                             str[i+1]="-"+str[i+1];
-//                            System.out.println( str[i+1]+"lol");
+
                             continue;
                         }
                         else {
