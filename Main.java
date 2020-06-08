@@ -125,6 +125,54 @@ public class Main {
                 System.out.println("Unknown command");
                    }
         }
+   public static String postfix(String[] s){
+        Stack<String> stack=new Stack<>();
+        String pfix="";
+        for(String c:s){
+         if(c.equals("(")) stack.push("(");
+         if(c.matches("[a-zA-Z]+")){
+             pfix +=c;
+         }
+         if(c.matches("[*/%+-]")){
+             if(stack.empty()) stack.push(c);
+             else if(!stack.empty()) {
+                 boolean push = false;
+                 while (!push) {
+                     if (priority(c) > priority(stack.peek())) {
+                         stack.push(c);
+                         push = true;
+                     } else if (priority(c) < priority(stack.peek())) {
+                         pfix += stack.pop();
+                     }
+                 }
+             }
+         }
+         if(c.equals(")")){
+             while(!stack.peek().equals("(")){
+                 pfix +=stack.pop();
+             }
+             stack.pop();
+         }
+
+        }
+        while (!stack.empty()){
+            pfix +=stack.pop();
+        }
+        return pfix;
+   }
+   public static   int priority(String s){
+        int  n=0;
+        switch (s){
+
+            case "*": n=4;
+            case  "/": n=3;
+            case "%":n=2;
+            case "+":n=1;
+            case "-":n=0;
+        }
+        return n;
+   }
 }
+
 
 
