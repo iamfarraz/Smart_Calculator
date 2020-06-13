@@ -1,5 +1,7 @@
 package calculator;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
   static   Scanner sc = new Scanner(System.in);
@@ -57,37 +59,70 @@ public class Main {
 
         return map;
        }
-
     public static void cal(String s,Map<String ,Integer> map) {
 
         if (!s.equals("") && !s.matches("/.+")) {
             boolean vld = true;
+
+
+         s= s.replaceAll("\\++"," + ");
+         s= s.replaceAll("/"," / ");
+         s= s.replaceAll("%"," % ");
+         s= s.replaceAll("\\("," ( ");
+         s= s.replaceAll("\\)"," ) ");
+         s= s.replaceAll("\\*"," * ");
+
+         s=s.trim();
             String[] str = s.split(" +");
             for (int i = 0; i < str.length; i++) {
                 if (map.containsKey(str[i])) {
                     str[i] = String.valueOf(map.get(str[i]));
                     continue;
                 }
+
             }
-            for (int i = 0; i < str.length; i++) {
-                if (str[i].matches("-+")) {
-                    if (str[i].length() % 2 != 0) {
-                        str[i] = str[i].replaceAll("-+", "-");
+            List<String> lst_str=new ArrayList<>();
+            for (int i = 0; i < str.length; i++) lst_str.add(str[i]);
 
-                        continue;
-                    } else {
-                        str[i] = str[i].replaceAll("-+", "+");
+            for (int i = 0; i < lst_str.size(); i++) {
 
-                        continue;
+                Pattern p=Pattern.compile("-+");
+                Matcher m=p.matcher(lst_str.get(i));
+                if (m.find()) {
+                 int l=lst_str.get(i).length()-lst_str.get(i).replaceAll("-+","").length();
+                    if (l % 2 == 0) {
+                         String temp=lst_str.get(i).replaceAll("-+"," + ");
+                        System.out.println(temp);
+                         lst_str.remove(i);
+
+                        String[] nums=temp.split(" +");
+                        for(int j=nums.length-1;j>=0;j--){
+                            lst_str.add(i,nums[j]);
+                        }
+
+
+                    }
+                    else {
+                        String temp=lst_str.get(i).replaceAll("-+", " - ");
+                        lst_str.remove(i);
+
+                        String[] nums=temp.split(" +");
+                      for(int j=nums.length-1;j>0;j--){
+                          lst_str.add(i,nums[j]);
+                      }
+
+
                     }
                 }
-                if (str[i].matches("\\++")) {
-                    str[i] = str[i].replaceAll("\\++", "+");
-
-                    continue;
-                }
             }
-            postfix_eval(postfix(str));
+//                if (str[i].matches("\\++")) {
+//                    str[i] = str[i].replaceAll("\\++", " + ");
+//
+//                    continue;
+//                }
+//            }
+
+            postfix_eval(postfix(lst_str));
 
 //                List<Integer> num = new ArrayList();
 //                    try {
@@ -120,7 +155,7 @@ public class Main {
             System.out.println("Unknown command");
         }
     }
-   public static String postfix(String[] s){
+   public static String postfix(List<String> s){
         Stack<String> stack=new Stack<>();
         String snew="";
        String pfix = "";
@@ -128,16 +163,16 @@ public class Main {
         char[] chr=snew.toCharArray();
         if(brckt_blnce(chr)) {
             for (String c : s) {
-//                System.out.println(c);
-                if (c.contains("(")) {
-                    char [] brck=c.toCharArray();
+//              System.out.println(c);
+
+                if (c.equals("(")) {
                     stack.push("(");
-                    c = c.replace("(", "");
-                    if (c.matches("[a-zA-Z]+|\\d+|-\\d+|\\+\\d+")) {
-                        pfix += c + " ";
-                    }
+//                    c = c.replace("(", "");
+//                    if (c.matches("[a-zA-Z]+|\\d+|-\\d+|\\+\\d+")) {
+//                        pfix += c + " ";
+//                    }
                 }
-                else if (c.matches("[a-zA-Z]+|\\d+|-\\d+|\\+\\d+")) {
+               else if (c.matches("[a-zA-Z]+|\\d+|-\\d+|\\+\\d+")) {
                     pfix += c + " ";
                 }
                 else if (c.matches("[*/%\\+-]")) {
@@ -158,19 +193,20 @@ public class Main {
                         }
                     }
                 }
-                else if (c.contains(")")) {
-                    c = c.replace(")", "");
-                    if (c.matches("[a-zA-Z]+|\\d+")) {
-                        pfix += c + " ";
-                    }
+                else if (c.equals(")")) {
+//                    c = c.replace(")", "");
+//                    if (c.matches("[a-zA-Z]+|\\d+|-\\d+|\\+\\d+")) {
+//                        pfix += c + " ";
+//                    }
                     while (!stack.peek().equals("(")) {
                         pfix += stack.pop() + " ";
                     }
                     stack.pop();
                 }
+
                 else{
                     pfix="Invalid expression"; //when invalid calculation
-                    System.out.println("lol");
+//                    System.out.println("lol"+ stack+"c is"+c+"pfix"+pfix);
                     break;
                 }
 
@@ -179,7 +215,7 @@ public class Main {
             while (!stack.empty()) {
                 pfix += stack.pop() + " ";
             }
-            System.out.println(pfix);
+//            System.out.println(pfix);
             return pfix;
         }
         else {
@@ -191,16 +227,13 @@ public class Main {
    public static   int priority(String s){
         int  n=0;
         switch (s){
-
             case "%": n=4; break;
             case  "/": n=3; break;
             case "*":n=2; break;
             case "-":n=1; break;
             case "+":n=0; break;
             case "(": n=-1; break;
-
         }
-
         return n;
    }
    public static void postfix_eval(String s){
