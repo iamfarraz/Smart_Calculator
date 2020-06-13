@@ -94,31 +94,6 @@ public class Main {
             }
             postfix_eval(postfix(str));
 
-//                List<Integer> num = new ArrayList();
-//                    try {
-//                        num.add(Integer.parseInt(str[i]));
-//                    } catch (Exception e) {
-//                        System.out.println("Invalid expression");
-//                        vld = false;
-//                        break;
-//                    }
-
-
-//                for (int i = 0; i < str.length-1; i++) {
-//                    if (str[i].matches("\\d+") && !str[i+1].matches("\\+|-") ){
-//                        vld=false;
-//                        System.out.println("Invalid expression");
-//                    }
-//                }
-//
-//                if(vld==true) {
-//                    int rslt = 0;
-//                    for (int i = 0; i < num.size(); i++) {
-//                        rslt += num.get(i);
-//                       }
-//                    System.out.println(rslt);
-//                }
-//            }
 
         }
         else if (s.matches("/.+") && !s.equals("/exit")) {
