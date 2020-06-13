@@ -1,13 +1,15 @@
 package calculator;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Main {
+public class Main  {
     static   Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
         String s = sc.nextLine().trim();
-        Map<String ,Integer> keyvalue=new TreeMap<>();
+        Map<String ,String> keyvalue=new TreeMap<>();
+
         while (!s.equals("/exit")) {
 
             String[] str=s.split(" +");
@@ -30,7 +32,7 @@ public class Main {
         }
         System.out.println("Bye!");
     }
-    public static  Map<String ,Integer> varasgn(String[] s, Map<String ,Integer> map){
+    public static  Map<String ,String> varasgn(String[] s, Map<String ,String> map){
         if(s.length==2){
             if(map.containsKey(s[1])){
                 map.put(s[0],map.get(s[1]));
@@ -40,7 +42,7 @@ public class Main {
             }
             else{
                 try {
-                    map.put(s[0], Integer.valueOf(s[1]));
+                    map.put(s[0], s[1]);
                 }
                 catch (Exception e){
                     System.out.println("Invalid assignment");
@@ -59,7 +61,7 @@ public class Main {
 
         return map;
     }
-    public static void cal(String s,Map<String ,Integer> map) {
+    public static void cal(String s,Map<String ,String> map) {
 
         if (!s.equals("") && !s.matches("/.+")) {
             boolean vld = true;
@@ -180,23 +182,23 @@ public class Main {
         boolean vld=true;
         if(!s.equals("Invalid expression")){
             String[] s1=s.split(" ");
-            Stack<Integer> rslt=new Stack<>();
+            Stack<BigInteger> rslt=new Stack<>();
             for (String c:s1){
                 if(c.matches("\\d+|-\\d+|\\+\\d+")){
-                    rslt.push(Integer.parseInt(c));
+                    rslt.push(new BigInteger(c));
 //                System.out.println(rslt);
                 }
                 else if(c.matches("[+-/%*]")){
 
-                    int b=rslt.pop();
-                    int a=rslt.pop();
-                    int cal=0;
+                    BigInteger b=rslt.pop();
+                    BigInteger a=rslt.pop();
+                    BigInteger cal=BigInteger.ZERO;
                     switch (c){
-                        case "*":cal=a*b; break;
-                        case "/":cal=a/b; break;
-                        case "%":cal=a%b; break;
-                        case "+":cal=a+b; break;
-                        case "-":cal=a-b; break;
+                        case "*":cal=a.multiply(b); break;
+                        case "/":cal=a.divide(b); break;
+                        case "%":cal=a.remainder(b); break;
+                        case "+":cal=a.add(b); break;
+                        case "-":cal=a.subtract(b); break;
                     }
                     rslt.push(cal);
                 }
@@ -226,6 +228,7 @@ public class Main {
         return p;
     }
 }
+
 
 
 
