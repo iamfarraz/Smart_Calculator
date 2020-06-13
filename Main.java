@@ -4,38 +4,38 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
-  static   Scanner sc = new Scanner(System.in);
+    static   Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
         String s = sc.nextLine().trim();
-         Map<String ,Integer> keyvalue=new TreeMap<>();
+        Map<String ,Integer> keyvalue=new TreeMap<>();
         while (!s.equals("/exit")) {
 
             String[] str=s.split(" +");
-           if(s.contains("=")){
-               s= s.replaceAll(" +","");
-              String[] kv=s.split("=");
-              if(kv[0].matches("[A-Za-z]+") ){
-             keyvalue.putAll(varasgn(kv,keyvalue));
-              }
-              else System.out.println("Invalid identifier");
-           }
-           else if(str.length==1 && str[0].matches("[A-Za-z]+")){
-                  keyvalue.putAll(varasgn(str,keyvalue));
-           }
-           else{
-               cal(s,keyvalue);
-           }
+            if(s.contains("=")){
+                s= s.replaceAll(" +","");
+                String[] kv=s.split("=");
+                if(kv[0].matches("[A-Za-z]+") ){
+                    keyvalue.putAll(varasgn(kv,keyvalue));
+                }
+                else System.out.println("Invalid identifier");
+            }
+            else if(str.length==1 && str[0].matches("[A-Za-z]+")){
+                keyvalue.putAll(varasgn(str,keyvalue));
+            }
+            else{
+                cal(s,keyvalue);
+            }
 
             s = sc.nextLine().trim();
         }
         System.out.println("Bye!");
     }
-       public static  Map<String ,Integer> varasgn(String[] s, Map<String ,Integer> map){
+    public static  Map<String ,Integer> varasgn(String[] s, Map<String ,Integer> map){
         if(s.length==2){
             if(map.containsKey(s[1])){
                 map.put(s[0],map.get(s[1]));
             }
-             else if(!map.containsKey(s[1]) && s[1].matches("[A-Za-z]+")){
+            else if(!map.containsKey(s[1]) && s[1].matches("[A-Za-z]+")){
                 System.out.println("Unknown variable");
             }
             else{
@@ -58,71 +58,41 @@ public class Main {
         else System.out.println("Invalid assignment");
 
         return map;
-       }
+    }
     public static void cal(String s,Map<String ,Integer> map) {
 
         if (!s.equals("") && !s.matches("/.+")) {
             boolean vld = true;
+            s = s.replaceAll("\\++", "+");
+            Pattern p = Pattern.compile("[a-zA-Z]+|\\d+|[\\(\\*\\)\\+/%]|-+");
+            Matcher m = p.matcher(s);
 
+            List<String> str=new LinkedList<>();
+            while (m.find()) {
+                str.add(m.group());
+            }
+            for (int i = 0; i < str.size(); i++) {
+                if (map.containsKey(str.get(i))) {
+                    str.set(i,String.valueOf(map.get(str.get(i))));
 
-         s= s.replaceAll("\\++"," + ");
-         s= s.replaceAll("/"," / ");
-         s= s.replaceAll("%"," % ");
-         s= s.replaceAll("\\("," ( ");
-         s= s.replaceAll("\\)"," ) ");
-         s= s.replaceAll("\\*"," * ");
-
-         s=s.trim();
-            String[] str = s.split(" +");
-            for (int i = 0; i < str.length; i++) {
-                if (map.containsKey(str[i])) {
-                    str[i] = String.valueOf(map.get(str[i]));
                     continue;
                 }
-
             }
-            List<String> lst_str=new ArrayList<>();
-            for (int i = 0; i < str.length; i++) lst_str.add(str[i]);
+            for (int i = 0; i < str.size(); i++) {
+                if (str.get(i).matches("-+")) {
+                    if (str.get(i).length() % 2 != 0) {
+                       str.set(i, str.get(i).replaceAll("-+", "-"));
 
-            for (int i = 0; i < lst_str.size(); i++) {
+                        continue;
+                    } else {
+                        str.set(i,str.get(i).replaceAll("-+", "+"));
 
-                Pattern p=Pattern.compile("-+");
-                Matcher m=p.matcher(lst_str.get(i));
-                if (m.find()) {
-                 int l=lst_str.get(i).length()-lst_str.get(i).replaceAll("-+","").length();
-                    if (l % 2 == 0) {
-                         String temp=lst_str.get(i).replaceAll("-+"," + ");
-                        System.out.println(temp);
-                         lst_str.remove(i);
-
-                        String[] nums=temp.split(" +");
-                        for(int j=nums.length-1;j>=0;j--){
-                            lst_str.add(i,nums[j]);
-                        }
-
-
-                    }
-                    else {
-                        String temp=lst_str.get(i).replaceAll("-+", " - ");
-                        lst_str.remove(i);
-
-                        String[] nums=temp.split(" +");
-                      for(int j=nums.length-1;j>0;j--){
-                          lst_str.add(i,nums[j]);
-                      }
-
-
+                        continue;
                     }
                 }
-            }
-//                if (str[i].matches("\\++")) {
-//                    str[i] = str[i].replaceAll("\\++", " + ");
-//
-//                    continue;
-//                }
-//            }
 
-            postfix_eval(postfix(lst_str));
+            }
+            postfix_eval(postfix(str));
 
 //                List<Integer> num = new ArrayList();
 //                    try {
@@ -151,31 +121,27 @@ public class Main {
 //            }
 
         }
-       else if (s.matches("/.+") && !s.equals("/exit")) {
+        else if (s.matches("/.+") && !s.equals("/exit")) {
             System.out.println("Unknown command");
         }
     }
-   public static String postfix(List<String> s){
+    public static String postfix(List<String> s){
         Stack<String> stack=new Stack<>();
         String snew="";
-       String pfix = "";
+        String pfix = "";
         for(String add:s) snew+=add;
         char[] chr=snew.toCharArray();
         if(brckt_blnce(chr)) {
             for (String c : s) {
-//              System.out.println(c);
-
-                if (c.equals("(")) {
+//                System.out.println(c);
+                if (c.contains("(")) {
                     stack.push("(");
-//                    c = c.replace("(", "");
-//                    if (c.matches("[a-zA-Z]+|\\d+|-\\d+|\\+\\d+")) {
-//                        pfix += c + " ";
-//                    }
+
                 }
-               else if (c.matches("[a-zA-Z]+|\\d+|-\\d+|\\+\\d+")) {
+                else if (c.matches("[a-zA-Z]+|\\d+|-\\d+|\\+\\d+")) {
                     pfix += c + " ";
                 }
-                else if (c.matches("[*/%\\+-]")) {
+                else if (c.matches("[\\*/%\\+-]")) {
 
                     if (stack.empty()) stack.push(c);
                     else if (!stack.empty()) {
@@ -193,20 +159,19 @@ public class Main {
                         }
                     }
                 }
-                else if (c.equals(")")) {
-//                    c = c.replace(")", "");
-//                    if (c.matches("[a-zA-Z]+|\\d+|-\\d+|\\+\\d+")) {
-//                        pfix += c + " ";
-//                    }
+                else if (c.contains(")")) {
+                    c = c.replace(")", "");
+                    if (c.matches("[a-zA-Z]+|\\d+|-\\d+|\\+\\d+")) {
+                        pfix += c + " ";
+                    }
                     while (!stack.peek().equals("(")) {
                         pfix += stack.pop() + " ";
                     }
                     stack.pop();
                 }
-
                 else{
                     pfix="Invalid expression"; //when invalid calculation
-//                    System.out.println("lol"+ stack+"c is"+c+"pfix"+pfix);
+                    System.out.println("lol"+ stack);
                     break;
                 }
 
@@ -223,8 +188,8 @@ public class Main {
             System.out.println(pfix);
         }
         return pfix;
-   }
-   public static   int priority(String s){
+    }
+    public static   int priority(String s){
         int  n=0;
         switch (s){
             case "%": n=4; break;
@@ -235,57 +200,60 @@ public class Main {
             case "(": n=-1; break;
         }
         return n;
-   }
-   public static void postfix_eval(String s){
+    }
+    public static void postfix_eval(String s){
         boolean vld=true;
         if(!s.equals("Invalid expression")){
-        String[] s1=s.split(" ");
-        Stack<Integer> rslt=new Stack<>();
-        for (String c:s1){
-            if(c.matches("\\d+|-\\d+|\\+\\d+")){
-                rslt.push(Integer.parseInt(c));
+            String[] s1=s.split(" ");
+            Stack<Integer> rslt=new Stack<>();
+            for (String c:s1){
+                if(c.matches("\\d+|-\\d+|\\+\\d+")){
+                    rslt.push(Integer.parseInt(c));
 //                System.out.println(rslt);
-            }
-             else if(c.matches("[+-/%*]")){
+                }
+                else if(c.matches("[+-/%*]")){
 
-                 int b=rslt.pop();
-                int a=rslt.pop();
-                 int cal=0;
-                 switch (c){
-                     case "*":cal=a*b; break;
-                     case "/":cal=a/b; break;
-                     case "%":cal=a%b; break;
-                     case "+":cal=a+b; break;
-                     case "-":cal=a-b; break;
-                 }
-                 rslt.push(cal);
+                    int b=rslt.pop();
+                    int a=rslt.pop();
+                    int cal=0;
+                    switch (c){
+                        case "*":cal=a*b; break;
+                        case "/":cal=a/b; break;
+                        case "%":cal=a%b; break;
+                        case "+":cal=a+b; break;
+                        case "-":cal=a-b; break;
+                    }
+                    rslt.push(cal);
+                }
+                else{
+                    vld=false;
+                    System.out.println("Invalid expression");
+                    break;
+                }
             }
-             else{
-                 vld=false;
-                System.out.println("Invalid expression");
-                break;
-            }
+            if(vld) System.out.println(rslt.peek());}
+    }
+    public static boolean brckt_blnce(char[] brckt){
+        Stack<Character> chck=new Stack<>();
+        boolean p=true;
+        for(Character c:brckt){
+            if(c.equals('{')) chck.push('{');
+            else if(c.equals('(')) chck.push('(');
+            else if(c.equals('[')) chck.push('[');
+            if (!chck.empty() &&c.equals('}')&& chck.peek().equals('{') ) chck.pop();
+            else if (!chck.empty() &&c.equals(']')&& chck.peek().equals('[') ) chck.pop();
+            else   if (!chck.empty() &&c.equals(')')&& chck.peek().equals('(') ) chck.pop();
+            else if(c.equals('}')||c.equals(']')||c.equals(')') ) p=false;
         }
-      if(vld) System.out.println(rslt.peek());}
-   }
-   public static boolean brckt_blnce(char[] brckt){
-       Stack<Character> chck=new Stack<>();
-       boolean p=true;
-       for(Character c:brckt){
-           if(c.equals('{')) chck.push('{');
-           else if(c.equals('(')) chck.push('(');
-           else if(c.equals('[')) chck.push('[');
-           if (!chck.empty() &&c.equals('}')&& chck.peek().equals('{') ) chck.pop();
-           else if (!chck.empty() &&c.equals(']')&& chck.peek().equals('[') ) chck.pop();
-           else   if (!chck.empty() &&c.equals(')')&& chck.peek().equals('(') ) chck.pop();
-           else if(c.equals('}')||c.equals(']')||c.equals(')') ) p=false;
-       }
-       if(chck.empty() && p) p=true;
-       else p=false;
+        if(chck.empty() && p) p=true;
+        else p=false;
 
-       return p;
-   }
+        return p;
+    }
 }
+
+
+
 
 
 
